@@ -15,7 +15,10 @@ public class PlayerMovement : MonoBehaviour
     private float jumpHeight = 3.0f;
     private float jumpTime = 0.5f;
     private float initialjumpVelocity;
-
+    private bool doubleJumpOk = true;
+    private int jumpsAvailable = 2;
+    private int jumpsMax = 2;
+    private bool isJumping = false;
    [SerializeField]
     public CharacterController cc;
 
@@ -26,6 +29,8 @@ public class PlayerMovement : MonoBehaviour
         gravity = (-2 * jumpHeight) / Mathf.Pow(timetoApex, 2);
 
         initialjumpVelocity = (2 * jumpHeight) / timetoApex;
+
+        jumpsAvailable = jumpsMax;
        
     }
 
@@ -41,20 +46,46 @@ public class PlayerMovement : MonoBehaviour
         yVelocity += gravity * Time.deltaTime;
         if (cc.isGrounded && yVelocity < 0.0)
         {
+            isJumping = false;
             yVelocity = yVelocityGrounded;
+            jumpsAvailable = jumpsMax;
+            //doubleJumpOk = 2;
         }
 
-
-        
-        if (Input.GetButtonDown("Jump") && cc.isGrounded)
+        //falling!
+        if (!cc.isGrounded && !isJumping)
         {
-            yVelocity = initialjumpVelocity;
+            jumpsAvailable = 1;
         }
+
+        if (Input.GetButtonDown("Jump") && jumpsAvailable > 0 )
+        {
+            isJumping = true;
+            yVelocity = initialjumpVelocity;
+            jumpsAvailable--; 
+            
+
+        }
+     
+
+        //if (Input.GetButtonDown("Jump") && cc.isGrounded)
+        //{
+        //    yVelocity = initialjumpVelocity;
+        //    //jumpsAvailable--; 
+        //    //doubleJumpOk = true;
+
+        //}else {
+        //    if(doubleJumpOk && Input.GetButtonDown("Jump")){
+        //        doubleJumpOk = false;
+        //        yVelocity = initialjumpVelocity;
+        //    }
+        //}
 
         movement.y = yVelocity;
         cc.Move(movement * Time.deltaTime);
 
         Vector3 rotation = new Vector3(0, Input.GetAxis("Mouse X"), 0);
-        transform.Rotate(rotation * Time.deltaTime * rotSpeed);
+        //transform.Rotate(rotation * Time.deltaTime * rotSpeed);
+         transform.Rotate(rotation * speed);
     }
 }
